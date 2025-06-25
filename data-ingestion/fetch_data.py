@@ -1,13 +1,16 @@
-# fetch_data.py
 import requests
 import pandas as pd
+import os
 
-def fetch_and_save():
-    url = "https://api.covid19api.com/summary"
-    response = requests.get(url)
-    data = response.json()
-    df = pd.json_normalize(data['Countries'])
-    df.to_csv("data/latest_data.csv", index=False)
+# Create data directory if not exists
+os.makedirs("data", exist_ok=True)
 
-if __name__ == "__main__":
-    fetch_and_save()
+# Fetch data from COVID19 API
+url = "https://api.covid19api.com/summary"
+response = requests.get(url)
+data = response.json()
+
+# Normalize and save
+df = pd.json_normalize(data['Countries'])
+df.to_csv("data/covid_summary.csv", index=False)
+print("Downloaded and saved as data/covid_summary.csv")
