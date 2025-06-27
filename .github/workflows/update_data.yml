@@ -35,3 +35,4 @@ jobs:
           git add data/
           git diff --cached --quiet || git commit -m "Daily data update"
           git push
+# trigger update
