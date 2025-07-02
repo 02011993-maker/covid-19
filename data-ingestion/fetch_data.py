@@ -1,21 +1,15 @@
-import requests
 import pandas as pd
 import os
 
-# Create data directory if not exists
-os.makedirs("data", exist_ok=True)
+# WHO COVID-19 dataset
+URL = "https://covid19.who.int/WHO-COVID-19-global-data.csv"
+DATA_DIR = "data"
+os.makedirs(DATA_DIR, exist_ok=True)
 
-# Fetch data from COVID19 API
-url = "https://api.covid19api.com/summary"
-response = requests.get(url)
-
-if response.status_code == 200:
-    data = response.json()
-    df = pd.json_normalize(data['Countries'])
-    df = df[['Country', 'Date', 'TotalConfirmed', 'TotalDeaths']]
-    df.rename(columns={'TotalConfirmed': 'Confirmed', 'TotalDeaths': 'Deaths'}, inplace=True)
-    df['Date'] = pd.to_datetime(df['Date'])
-    df.to_csv("data/covid_summary.csv", index=False)
-    print("Downloaded and saved as data/covid_summary.csv")
-else:
-    print(f"Failed to fetch data: {response.status_code}")
+try:
+    df = pd.read_csv(URL)
+    df.to_csv(os.path.join(DATA_DIR, "covid_summary.csv"), index=False)
+    print("✅ Downloaded WHO data and saved as covid_summary.csv")
+except Exception as e:
+    print(f"❌ Failed to fetch WHO data: {e}")
+    exit(1)

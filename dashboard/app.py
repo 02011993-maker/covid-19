@@ -11,10 +11,10 @@ df['Date'] = pd.to_datetime(df['Date'])
 app = dash.Dash(__name__)
 
 app.layout = html.Div([
-    html.H1("Global COVID-19 Dashboard"),
+    html.H1("🌍 Global COVID-19 Dashboard"),
     dcc.Dropdown(
         id='country',
-        options=[{'label': c, 'value': c} for c in df['Country'].unique()],
+        options=[{'label': c, 'value': c} for c in sorted(df['Country'].unique())],
         value='India'
     ),
     dcc.Graph(id='covid-trend', config={'responsive': True})
@@ -26,8 +26,10 @@ app.layout = html.Div([
 )
 def update_graph(selected_country):
     dff = df[df['Country'] == selected_country].sort_values('Date')
-    fig = px.line(dff, x='Date', y='TotalConfirmed',
-                  title=f"COVID-19 Cases in {selected_country}")
+    fig = px.line(dff, x='Date', y='Confirmed',
+                  title=f"📈 COVID-19 Confirmed Cases in {selected_country}",
+                  markers=True)
+    fig.update_layout(transition_duration=500)
     return fig
 
 if __name__ == '__main__':
