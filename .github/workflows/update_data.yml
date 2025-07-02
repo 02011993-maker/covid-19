@@ -16,7 +16,15 @@ jobs:
       - name: 🐍 Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.12  # Use 3.12 (not 3.13 — unsupported on Ubuntu 24.04)
+          python-version: 3.12
+
+      - name: ⚡ Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: 📥 Install Dependencies
         run: |
@@ -25,6 +33,7 @@ jobs:
 
       - name: 🔄 Fetch and Process Data
         run: |
+          set -e
           python data-ingestion/fetch_data.py
           python processing/process_data.py
 
@@ -33,5 +42,8 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add data/
-          git commit -m "Automated daily data update"
-          git push
+          if git diff --cached --quiet; then
+            echo "🟢 No changes to commit"
+          else
+            git commit -m "Automated daily data update"
+            git push
